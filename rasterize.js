@@ -12,7 +12,7 @@ var Eye = new vec4.fromValues(0.5,0.5,-0.5,1.0); // default eye position in worl
 var gl = null; // the all powerful gl object. It's all here folks!
 var vertexBuffer; // this contains vertex coordinates in triples
 var triangleBuffer; // this contains indices into vertexBuffer in triples
-var triBufferSize; // the number of indices in the triangle buffer
+var triBufferSize = 0; // the number of indices in the triangle buffer
 var vertexPositionAttrib; // where to put position for vertex shader
 
 
@@ -75,6 +75,11 @@ function loadTriangles() {
         var whichSetVert; // index of vertex in current triangle set
         var whichSetTri; // index of triangle in current triangle set
         var coordArray = []; // 1D array of vertex coords for WebGL
+        var indexArray = []; // 1D array of vertex indices for WebGL
+        var vtxBufferSize = 0; // the number of vertices in the vertex buffer
+        var vtxToAdd = []; // vtx coords to add to the coord array
+        var indexOffset = vec3.create(); // the index offset for the current set
+        var triToAdd = vec3.create(); // tri indices to add to the index array
         
         for (var whichSet=0; whichSet<inputTriangles.length; whichSet++) {
             vec3.set(indexOffset,vtxBufferSize,vtxBufferSize,vtxBufferSize); // update vertex offset
