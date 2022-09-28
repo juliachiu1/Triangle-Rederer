@@ -14,7 +14,9 @@ var vertexBuffer; // this contains vertex coordinates in triples
 var triangleBuffer; // this contains indices into vertexBuffer in triples
 var triBufferSize = 0; // the number of indices in the triangle buffer
 var vertexPositionAttrib; // where to put position for vertex shader
-
+var ambient = [];
+var diffuse = [];
+var specular = [];
 
 // ASSIGNMENT HELPER FUNCTIONS
 
@@ -71,6 +73,7 @@ function setupWebGL() {
 // read triangles in, load them into webgl buffers
 function loadTriangles() {
     var inputTriangles = getJSONFile(INPUT_TRIANGLES_URL,"triangles");
+
     if (inputTriangles != String.null) { 
         var whichSetVert; // index of vertex in current triangle set
         var whichSetTri; // index of triangle in current triangle set
@@ -80,10 +83,29 @@ function loadTriangles() {
         var vtxToAdd = []; // vtx coords to add to the coord array
         var indexOffset = vec3.create(); // the index offset for the current set
         var triToAdd = vec3.create(); // tri indices to add to the index array
-        
-        for (var whichSet=0; whichSet<inputTriangles.length; whichSet++) {
+        var ambArray = [];
+        var difArray = [];
+        var speArray = [];
+        var ambToAdd = vec3.create();
+        var difToAdd = vec3.create();
+        var speToAdd = vec3.create();
+
+        for (var whichSet = 0; whichSet < inputTriangles.length; whichSet++) {
             vec3.set(indexOffset,vtxBufferSize,vtxBufferSize,vtxBufferSize); // update vertex offset
+
+            var amb = inputTriangles[whichSet].material.ambient;
+            var dif = inputTriangles[whichSet].material.diffuse;
+            var spe = inputTriangles[whichSet].material.specular;
+
+
+            vec3.set(ambToAdd, amb[0], amb[1], amb[2]);
+            vec3.set(difToAdd, dif[0], dif[1], dif[2]);
+            vec3.set(speToAdd, spe[0], spe[1], spe[2]);
             
+            ambArray.push(ambToAdd);
+            difArray.push(difToAdd);
+            speArray.push(speToAdd);
+
             // set up the vertex coord array
             for (whichSetVert=0; whichSetVert<inputTriangles[whichSet].vertices.length; whichSetVert++) {
                 vtxToAdd = inputTriangles[whichSet].vertices[whichSetVert];
@@ -112,6 +134,11 @@ function loadTriangles() {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(indexArray),gl.STATIC_DRAW); // indices to that buffer
    
     } // end if triangles found
+
+    // console.log("ambient: " + ambArray[1]);
+    // console.log("diffuse: " + difArray[1]);
+    // console.log("specular: " + speArray[1]);
+
 } // end load triangles
 
 // setup the webGL shaders
